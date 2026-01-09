@@ -14,19 +14,27 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Loo esialgsed analüüsi ülesanded
-        # See samm töötab ainult üks kord (kui issuesid on 0) või vajadusel saab käivitada käsitsi
-        # Lihtsuse mõttes on siin näide, kuidas kasutada 'gh' käsurida issue loomiseks
+      - name: Loo sildid ja esialgsed ülesanded
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          # Kontrollime, kas issuesid juba on, et mitte duplikeerida
+          # 1. Kontrollime, kas issuesid juba on
           COUNT=$(gh issue list --state all --json number --jq length)
+
           if [ "$COUNT" -eq "0" ]; then
+            echo "Alustan projekti initsialiseerimist..."
+
+            # 2. LOOME SILDID (See parandab vea)
+            # Kasutame --force lippu, et kui silt on juba olemas, siis viga ei teki.
+            gh label create "seadistus" --color "fbca04" --description "Projekti ülesseadmine" --force
+            gh label create "analüüs" --color "0e8a16" --description "Uuringud ja analüüs" --force
+            gh label create "planeerimine" --color "5319e7" --description "Sprintide planeerimine" --force
+
+            # 3. LOOME ÜLESANDED
             
             gh issue create \
-              --title "Seadista GitHub Projects töölaud" \
-              --body "1. Mine 'Projects' vahekaardile.<br>2. Loo uus projekt (Board template).<br>3. Määra veerud: Todo, In Progress, Done.<br>4. Seo see projekt käesoleva repositooriumiga." \
+              --title "🚀 SAMM 1: Seadista Projektitahvel (Board)" \
+              --body "Selleks, et tööd hallata, tuleb luua tahvel.\n\n1. Vali ülevalt menüüst **Projects**.\n2. Vajuta rohelist nuppu **Link a project** -> **New project**.\n3. Vali **Board** mall.\n4. Pane nimeks 'Digiloovtöö' ja salvesta.\n5. Tule siia tagasi ja märgi see ülesanne tehtuks!" \
               --label "seadistus"
 
             gh issue create \
@@ -39,7 +47,7 @@ jobs:
               --body "Vaadake tiimiga üle 'Persoonad' ja otsustage, mida teete esimeses sprindis.\n- [ ] Loo User Storyd\n- [ ] Hinda tööde mahtu" \
               --label "planeerimine"
               
-            echo "Esialgsed ülesanded loodud!"
+            echo "Esialgsed ülesanded ja sildid loodud!"
           else
             echo "Ülesanded on juba olemas, ei loo uuesti."
           fi
