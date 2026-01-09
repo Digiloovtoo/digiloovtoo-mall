@@ -1,0 +1,45 @@
+name: Initsialiseeri Digiloovtöö Projekt
+on:
+  push:
+    branches: [main, master]
+    paths:
+      - "README.md" # Käivitub vaid siis, kui README faili muudetakse või esmasel loomisel
+
+jobs:
+  create-issues:
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Loo esialgsed analüüsi ülesanded
+        # See samm töötab ainult üks kord (kui issuesid on 0) või vajadusel saab käivitada käsitsi
+        # Lihtsuse mõttes on siin näide, kuidas kasutada 'gh' käsurida issue loomiseks
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          # Kontrollime, kas issuesid juba on, et mitte duplikeerida
+          COUNT=$(gh issue list --state all --json number --jq length)
+          if [ "$COUNT" -eq "0" ]; then
+            
+            gh issue create \
+              --title "Seadista GitHub Projects töölaud" \
+              --body "1. Mine 'Projects' vahekaardile.<br>2. Loo uus projekt (Board template).<br>3. Määra veerud: Todo, In Progress, Done.<br>4. Seo see projekt käesoleva repositooriumiga." \
+              --label "seadistus"
+
+            gh issue create \
+              --title "Persoonade ja stsenaariumide loomine" \
+              --body "## Ülesanne\nLuuakse projekti sihtrühma persoonad ja kasutusstsenaariumid.\n\n- [ ] Loo Wiki leht 'Persoonad'\n- [ ] Lisa vähemalt 2 persoonat piltide ja kirjeldusega\n- [ ] Loo Wiki leht 'Stsenaariumid'" \
+              --label "analüüs"
+
+            gh issue create \
+              --title "Esimese Sprindi planeerimine" \
+              --body "Vaadake tiimiga üle 'Persoonad' ja otsustage, mida teete esimeses sprindis.\n- [ ] Loo User Storyd\n- [ ] Hinda tööde mahtu" \
+              --label "planeerimine"
+              
+            echo "Esialgsed ülesanded loodud!"
+          else
+            echo "Ülesanded on juba olemas, ei loo uuesti."
+          fi
